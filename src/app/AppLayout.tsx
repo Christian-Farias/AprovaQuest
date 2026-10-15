@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router'
 import { navItems } from '@/app/nav'
 import { cn } from '@/shared/lib/cn'
 import { CloseIcon, MenuIcon } from '@/shared/ui/icons'
+import { StreakBadge } from '@/shared/ui/StreakBadge'
 
 function Brand() {
   return (
@@ -73,23 +74,29 @@ export function AppLayout() {
         <nav className="mt-6 flex-1 overflow-y-auto" aria-label="Navegação principal">
           <NavLinks />
         </nav>
-        <p className="mt-4 text-[11px] leading-relaxed text-ink-500">
-          Dados armazenados apenas neste dispositivo. Faça backups periódicos.
-        </p>
+        <div className="mt-4 space-y-3">
+          <StreakBadge />
+          <p className="text-[11px] leading-relaxed text-ink-500">
+            Dados armazenados apenas neste dispositivo. Faça backups periódicos.
+          </p>
+        </div>
       </aside>
 
       <div className="lg:pl-64">
         {/* Topbar (mobile) */}
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-ink-700 bg-ink-900/95 px-4 py-3 backdrop-blur lg:hidden">
           <Brand />
-          <button
-            type="button"
-            aria-label="Abrir menu"
-            onClick={() => setDrawerOpen(true)}
-            className="rounded-lg p-2 text-mist-200 hover:bg-ink-750"
-          >
-            <MenuIcon />
-          </button>
+          <div className="flex items-center gap-3">
+            <StreakBadge compact />
+            <button
+              type="button"
+              aria-label="Abrir menu"
+              onClick={() => setDrawerOpen(true)}
+              className="rounded-lg p-2 text-mist-200 hover:bg-ink-750"
+            >
+              <MenuIcon />
+            </button>
+          </div>
         </header>
 
         <main id="conteudo" className="mx-auto w-full max-w-6xl px-4 py-5 pb-28 lg:px-8 lg:pb-10">

@@ -1,12 +1,15 @@
 import { useOverallStats } from '@/modules/statistics/application/statistics.hooks'
+import { useStreak } from '@/modules/statistics/application/useStreak'
 import { formatDurationMs, formatPercent } from '@/shared/lib/format'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { StatCard } from '@/shared/ui/StatCard'
 import { LoadingState, SkeletonList } from '@/shared/ui/LoadingState'
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { StreakDashboardCard } from '@/shared/ui/StreakBadge'
 
 export function DashboardPage() {
   const stats = useOverallStats()
+  const streak = useStreak()
 
   if (stats === undefined) {
     return (
@@ -26,6 +29,9 @@ export function DashboardPage() {
         title="Painel"
         description="Indicadores calculados em tempo real a partir das suas tentativas registradas."
       />
+
+      {/* Streak card */}
+      {streak !== undefined && <StreakDashboardCard streak={streak} />}
 
       {!hasData ? (
         <EmptyState
