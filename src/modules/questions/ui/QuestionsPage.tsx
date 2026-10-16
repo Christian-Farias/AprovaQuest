@@ -4,10 +4,11 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { EmptyState } from '@/shared/ui/EmptyState'
-import { Field, Select } from '@/shared/ui/Field'
+import { Field, Input, Select } from '@/shared/ui/Field'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { SkeletonList } from '@/shared/ui/LoadingState'
 import { useToast } from '@/shared/toast/useToast'
+import { useConfirm } from '@/shared/ui/ConfirmDialog'
 import { useDisciplines, useQuestions } from '../application/questions.hooks'
 import { useQuestionsService } from '../application/useQuestionsService'
 import { QuestionFormModal } from './QuestionFormModal'
@@ -18,6 +19,7 @@ type StatusFilter = QuestionStatus | 'all'
 export function QuestionsPage() {
   const [disciplineId, setDisciplineId] = useState('')
   const [status, setStatus] = useState<StatusFilter>('active')
+  const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Question | undefined>()
   const [practicing, setPracticing] = useState<Question | undefined>()
@@ -29,17 +31,31 @@ export function QuestionsPage() {
   })
   const service = useQuestionsService()
   const toast = useToast()
+  const confirm = useConfirm()
 
   const disciplineNames = useMemo(
     () => new Map((disciplines ?? []).map((d) => [d.id, d.name])),
     [disciplines],
   )
 
+  const searchLower = search.trim().toLowerCase()
+  const filteredQuestions = useMemo(
+    () =>
+      !questions || !searchLower
+        ? questions
+        : questions.filter((q) => q.statement.toLowerCase().includes(searchLower)),
+    [questions, searchLower],
+  )
+
   async function handleDelete(question: Question) {
-    const confirmed = window.confirm(
-      'Excluir esta questão? Questões com tentativas registradas não podem ser excluídas — apenas arquivadas.',
-    )
-    if (!confirmed) return
+    const ok = await confirm({
+      title: 'Excluir esta questão?',
+      description:
+        'Questões com tentativas registradas não podem ser excluídas — apenas arquivadas. Esta ação não pode ser desfeita.',
+      confirmLabel: 'Excluir',
+      danger: true,
+    })
+    if (!ok) return
     const result = await service.deleteQuestion(question.id)
     if (result.ok) {
       toast.notify({ tone: 'success', title: 'Questão excluída' })
@@ -78,7 +94,14 @@ export function QuestionsPage() {
         }
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:max-w-xl">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:max-w-3xl">
+        <Field label="Busca textual">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar no enunciado…"
+          />
+        </Field>
         <Field label="Disciplina">
           <Select value={disciplineId} onChange={(e) => setDisciplineId(e.target.value)}>
             <option value="">Todas</option>
@@ -100,24 +123,30 @@ export function QuestionsPage() {
 
       {questions === undefined ? (
         <SkeletonList />
-      ) : questions.length === 0 ? (
+      ) : filteredQuestions !== undefined && filteredQuestions.length === 0 ? (
         <EmptyState
-          title="Nenhuma questão por aqui"
-          description="Cadastre uma questão manualmente ou importe um PDF na página “Importar PDFs”. Nada é criado automaticamente."
+          title={search ? 'Nenhuma questão encontrada' : 'Nenhuma questão por aqui'}
+          description={
+            search
+              ? `Nenhuma questão contém "${search}" no enunciado. Tente outros termos ou limpe a busca.`
+              : 'Cadastre uma questão manualmente ou importe um PDF na página "Importar PDFs". Nada é criado automaticamente.'
+          }
           action={
-            <Button
-              onClick={() => {
-                setEditing(undefined)
-                setFormOpen(true)
-              }}
-            >
-              Cadastrar questão
-            </Button>
+            !search ? (
+              <Button
+                onClick={() => {
+                  setEditing(undefined)
+                  setFormOpen(true)
+                }}
+              >
+                Cadastrar questão
+              </Button>
+            ) : undefined
           }
         />
       ) : (
         <ul className="space-y-3">
-          {questions.map((question) => (
+          {(filteredQuestions ?? []).map((question) => (
             <li key={question.id}>
               <Card>
                 <div className="flex flex-wrap items-start justify-between gap-3">

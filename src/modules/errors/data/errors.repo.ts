@@ -50,7 +50,11 @@ export function createErrorsRepo(db: AprovaQuestDatabase = getDb()) {
     })
   }
 
-  return { addErrorNote, listErrorNotes, getErrorNote, resolveErrorNote }
+  async function deleteErrorNote(id: string): Promise<void> {
+    await db.errorNotes.delete(id)
+  }
+
+  return { addErrorNote, listErrorNotes, getErrorNote, resolveErrorNote, deleteErrorNote }
 }
 
 export function scheduleReviewsForError(errorNoteId: string, baseDateIso: string, clock?: Clock): Review[] {

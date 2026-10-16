@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/Button'
 import { Field, Input, Select, Textarea } from '@/shared/ui/Field'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/toast/useToast'
-import { useDisciplines, useTopics } from '../application/questions.hooks'
+import { useDisciplines, useTopics, useBoards, useContests } from '../application/questions.hooks'
 import { useTaxonomyService } from '../application/useTaxonomyService'
 import { useQuestionsService } from '../application/useQuestionsService'
 
@@ -20,6 +20,8 @@ interface FormState {
   statement: string
   disciplineId: string
   topicId: string
+  boardId: string
+  contestId: string
   source: string
   explanation: string
   tags: string
@@ -50,6 +52,8 @@ export function QuestionFormModal({
   const questionsService = useQuestionsService()
   const taxonomyService = useTaxonomyService()
   const disciplines = useDisciplines()
+  const boards = useBoards()
+  const contests = useContests()
   const toast = useToast()
 
   const [form, setForm] = useState<FormState>(() => ({
@@ -57,6 +61,8 @@ export function QuestionFormModal({
     statement: '',
     disciplineId: '',
     topicId: '',
+    boardId: '',
+    contestId: '',
     source: '',
     explanation: '',
     tags: '',
@@ -74,6 +80,8 @@ export function QuestionFormModal({
         statement: question.statement,
         disciplineId: question.disciplineId,
         topicId: question.topicId ?? '',
+        boardId: question.boardId ?? '',
+        contestId: question.contestId ?? '',
         source: question.source ?? '',
         explanation: question.explanation ?? '',
         tags: question.tags.join(', '),
@@ -101,6 +109,8 @@ export function QuestionFormModal({
         statement: '',
         disciplineId: '',
         topicId: '',
+        boardId: '',
+        contestId: '',
         source: '',
         explanation: '',
         tags: '',
@@ -152,6 +162,8 @@ export function QuestionFormModal({
       statement: form.statement.trim(),
       disciplineId: form.disciplineId,
       topicId: form.topicId || null,
+      boardId: form.boardId || null,
+      contestId: form.contestId || null,
       source: form.source.trim() || null,
       explanation: form.explanation.trim() || null,
       tags: form.tags
@@ -323,7 +335,36 @@ export function QuestionFormModal({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Fonte / banca" hint="Opcional">
+          <Field label="Banca" hint="Opcional">
+            <Select
+              value={form.boardId}
+              onChange={(e) => setForm((c) => ({ ...c, boardId: e.target.value }))}
+            >
+              <option value="">Sem banca</option>
+              {(boards ?? []).map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Concurso" hint="Opcional">
+            <Select
+              value={form.contestId}
+              onChange={(e) => setForm((c) => ({ ...c, contestId: e.target.value }))}
+            >
+              <option value="">Sem concurso</option>
+              {(contests ?? []).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}{c.year ? ` (${c.year})` : ''}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Fonte / referência" hint="Opcional">
             <Input
               value={form.source}
               onChange={(e) => setForm((c) => ({ ...c, source: e.target.value }))}

@@ -1,5 +1,4 @@
 import type { Attempt } from '@/shared/db/types'
-import { toDayKey } from '@/shared/lib/dates'
 
 export const DAILY_GOAL = 10 // questões por dia para contar como dia estudado
 

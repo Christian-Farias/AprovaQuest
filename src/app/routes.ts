@@ -9,6 +9,7 @@ export const routes = {
   questionDetailPattern: '/questoes/:id',
   imports: '/importar',
   errors: '/erros',
+  reviews: '/revisoes',
   schedule: '/cronograma',
   statistics: '/estatisticas',
   backup: '/backup',

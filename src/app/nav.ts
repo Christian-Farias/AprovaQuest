@@ -5,6 +5,7 @@ import {
   ErrorsIcon,
   ImportIcon,
   QuestionsIcon,
+  ReviewIcon,
   ScheduleIcon,
   StatsIcon,
 } from '@/shared/ui/icons'
@@ -24,7 +25,8 @@ export const navItems: NavItem[] = [
   { to: routes.questions, label: 'Questões', icon: QuestionsIcon, primary: true },
   { to: routes.imports, label: 'Importar PDFs', icon: ImportIcon, primary: true },
   { to: routes.errors, label: 'Caderno de Erros', icon: ErrorsIcon, primary: false },
-  { to: routes.schedule, label: 'Cronograma', icon: ScheduleIcon, primary: true },
+  { to: routes.reviews, label: 'Revisão Espaçada', icon: ReviewIcon, primary: true },
+  { to: routes.schedule, label: 'Cronograma', icon: ScheduleIcon, primary: false },
   { to: routes.statistics, label: 'Estatísticas', icon: StatsIcon, primary: false },
   { to: routes.backup, label: 'Backup', icon: BackupIcon, primary: false },
 ]

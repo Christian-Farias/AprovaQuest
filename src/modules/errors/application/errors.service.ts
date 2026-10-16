@@ -21,7 +21,11 @@ export function createErrorsService(db: AprovaQuestDatabase = getDb()) {
     return toResult(async () => repo.resolveErrorNote(id, true, clock))
   }
 
-  return { createErrorNote, listErrorNotes, resolveErrorNote }
+  async function deleteErrorNote(id: string): Promise<Result<void>> {
+    return toResult(async () => repo.deleteErrorNote(id))
+  }
+
+  return { createErrorNote, listErrorNotes, resolveErrorNote, deleteErrorNote }
 }
 
 export type ErrorsService = ReturnType<typeof createErrorsService>

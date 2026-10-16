@@ -98,3 +98,14 @@ export function CloseIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function ReviewIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 2a10 10 0 1 0 10 10" />
+      <path d="M12 6v6l4 2" />
+      <path d="M18 2v4h4" />
+      <path d="M22 2 18 6" />
+    </svg>
+  )
+}
