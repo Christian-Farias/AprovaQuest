@@ -10,15 +10,22 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-// Registro do service worker com prompt de atualização (não apaga o IndexedDB).
-registerSW({
-  immediate: false,
-  onNeedRefresh() {
-    const shouldReload = window.confirm(
-      'Uma nova versão do AprovaQuest está disponível. Atualizar agora? Seus dados locais serão preservados.',
-    )
-    if (shouldReload) {
-      window.location.reload()
+// Destrava eventuais service workers que possam ter ficado em espera (waiting) de versões anteriores
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+      }
     }
+  })
+}
+
+// Registro com auto-atualização silenciosa (preserva IndexedDB)
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    // Ativa imediatamente o novo worker e recarrega para a nova versão
+    updateSW(true)
   },
 })

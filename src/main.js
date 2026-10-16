@@ -5,13 +5,18 @@ import './index.css';
 import { App } from './app/App';
 import { registerSW } from 'virtual:pwa-register';
 createRoot(document.getElementById('root')).render(_jsx(StrictMode, { children: _jsx(App, {}) }));
-// Registro do service worker com prompt de atualização (não apaga o IndexedDB).
-registerSW({
-    immediate: false,
-    onNeedRefresh() {
-        const shouldReload = window.confirm('Uma nova versão do AprovaQuest está disponível. Atualizar agora? Seus dados locais serão preservados.');
-        if (shouldReload) {
-            window.location.reload();
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+            if (registration.waiting) {
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
         }
+    });
+}
+const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+        updateSW(true);
     },
 });
