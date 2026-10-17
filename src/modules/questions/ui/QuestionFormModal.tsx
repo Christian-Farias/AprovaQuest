@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/Button'
 import { Field, Input, Select, Textarea } from '@/shared/ui/Field'
 import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/toast/useToast'
-import { useDisciplines, useTopics, useBoards, useContests } from '../application/questions.hooks'
+import { useDisciplines, useSubjects, useTopics, useBoards, useContests } from '../application/questions.hooks'
 import { useTaxonomyService } from '../application/useTaxonomyService'
 import { useQuestionsService } from '../application/useQuestionsService'
 
@@ -19,12 +19,14 @@ interface FormState {
   type: QuestionType
   statement: string
   disciplineId: string
+  subjectId: string
   topicId: string
   boardId: string
   contestId: string
   source: string
   explanation: string
   tags: string
+  difficulty: 1 | 2 | 3
   options: OptionDraft[]
 }
 
@@ -60,17 +62,20 @@ export function QuestionFormModal({
     type: 'multiple_choice',
     statement: '',
     disciplineId: '',
+    subjectId: '',
     topicId: '',
     boardId: '',
     contestId: '',
     source: '',
     explanation: '',
     tags: '',
+    difficulty: 1,
     options: defaultOptions('multiple_choice'),
   }))
   const [saving, setSaving] = useState(false)
 
-  const topics = useTopics(form.disciplineId || undefined)
+  const subjects = useSubjects(form.disciplineId || undefined)
+  const topics = useTopics({ disciplineId: form.disciplineId || undefined, subjectId: form.subjectId || undefined })
 
   useEffect(() => {
     if (!open) return
@@ -79,12 +84,14 @@ export function QuestionFormModal({
         type: question.type,
         statement: question.statement,
         disciplineId: question.disciplineId,
+        subjectId: question.subjectId ?? '',
         topicId: question.topicId ?? '',
         boardId: question.boardId ?? '',
         contestId: question.contestId ?? '',
         source: question.source ?? '',
         explanation: question.explanation ?? '',
         tags: question.tags.join(', '),
+        difficulty: question.difficulty ?? 1,
         options:
           question.type === 'true_false'
             ? defaultOptions('true_false')
@@ -108,12 +115,14 @@ export function QuestionFormModal({
         type: 'multiple_choice',
         statement: '',
         disciplineId: '',
+        subjectId: '',
         topicId: '',
         boardId: '',
         contestId: '',
         source: '',
         explanation: '',
         tags: '',
+        difficulty: 1,
         options: defaultOptions('multiple_choice'),
       })
     }
@@ -161,7 +170,9 @@ export function QuestionFormModal({
       type: form.type,
       statement: form.statement.trim(),
       disciplineId: form.disciplineId,
+      subjectId: form.subjectId || null,
       topicId: form.topicId || null,
+      difficulty: form.difficulty,
       boardId: form.boardId || null,
       contestId: form.contestId || null,
       source: form.source.trim() || null,
@@ -220,7 +231,7 @@ export function QuestionFormModal({
       }
     >
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <Field label="Tipo" required>
             <Select value={form.type} onChange={(e) => changeType(e.target.value as QuestionType)}>
               <option value="multiple_choice">Múltipla escolha</option>
@@ -230,7 +241,7 @@ export function QuestionFormModal({
           <Field label="Disciplina" required>
             <Select
               value={form.disciplineId}
-              onChange={(e) => setForm((c) => ({ ...c, disciplineId: e.target.value, topicId: '' }))}
+              onChange={(e) => setForm((c) => ({ ...c, disciplineId: e.target.value, subjectId: '', topicId: '' }))}
             >
               <option value="">Selecione…</option>
               {(disciplines ?? []).map((d) => (
@@ -240,26 +251,49 @@ export function QuestionFormModal({
               ))}
             </Select>
           </Field>
+          <Field label="Dificuldade (1-3)">
+            <Select value={form.difficulty} onChange={(e) => setForm((c) => ({ ...c, difficulty: Number(e.target.value) as 1 | 2 | 3 }))}>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+            </Select>
+          </Field>
         </div>
 
         {disciplines && disciplines.length === 0 ? (
           <QuickDiscipline onCreate={quickCreateDiscipline} />
         ) : null}
 
-        <Field label="Assunto" hint="Opcional">
-          <Select
-            value={form.topicId}
-            onChange={(e) => setForm((c) => ({ ...c, topicId: e.target.value }))}
-            disabled={!form.disciplineId}
-          >
-            <option value="">Sem assunto</option>
-            {(topics ?? []).map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Assunto" hint="Opcional">
+            <Select
+              value={form.subjectId}
+              onChange={(e) => setForm((c) => ({ ...c, subjectId: e.target.value, topicId: '' }))}
+              disabled={!form.disciplineId}
+            >
+              <option value="">Sem assunto</option>
+              {(subjects ?? []).map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Tópico" hint="Opcional">
+            <Select
+              value={form.topicId}
+              onChange={(e) => setForm((c) => ({ ...c, topicId: e.target.value }))}
+              disabled={!form.disciplineId}
+            >
+              <option value="">Sem tópico</option>
+              {(topics ?? []).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
 
         <Field label="Enunciado" required>
           <Textarea

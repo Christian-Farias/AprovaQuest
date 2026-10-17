@@ -17,15 +17,17 @@ import type {
   Setting,
   StudySession,
   Topic,
+  Subject,
 } from './types'
 import { migrateErrorNoteV1ToV2, migrateReviewV1ToV2, migrateStudySessionV1ToV3 } from './migrations'
 
 export const DB_NAME = 'aprovaquest'
-export const SCHEMA_VERSION = 4
+export const SCHEMA_VERSION = 5
 
 export class AprovaQuestDatabase extends Dexie {
   disciplines!: Table<Discipline, string>
   topics!: Table<Topic, string>
+  subjects!: Table<Subject, string>
   boards!: Table<Board, string>
   contests!: Table<Contest, string>
   questions!: Table<Question, string>
@@ -106,6 +108,13 @@ export class AprovaQuestDatabase extends Dexie {
     // v4 — armazenamento temporário do PDF para retomada de importações interrompidas.
     this.version(4).stores({
       importFiles: '&importId',
+    })
+
+    // v5 - add subjects table and extend taxonomy
+    this.version(5).stores({
+      subjects: '&id, disciplineId, name, [disciplineId+name], createdAt, updatedAt',
+      topics: '&id, disciplineId, subjectId, name, [disciplineId+name], [subjectId+name], createdAt, updatedAt',
+      questions: '&id, disciplineId, subjectId, topicId, boardId, contestId, type, status, annulled, createdAt, updatedAt, *tags',
     })
   }
 }

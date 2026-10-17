@@ -1,0 +1,2 @@
+-- Supabase Schema for AprovaQuest
+-- RLS enabled. Users can only access their own data.

@@ -44,7 +44,12 @@ export function toLocalDayKeyFromIso(iso: string): string {
  * - Se hoje ainda não atingiu a meta MAS ontem atingiu, a sequência está "em aberto"
  *   (mantém a contagem de ontem para não quebrar antes da meia-noite).
  */
-export function computeStreak(attempts: Attempt[], now: Date = new Date()): StreakResult {
+export function computeStreak(
+  attempts: Attempt[],
+  now: Date = new Date(),
+  goal: number = DAILY_GOAL,
+): StreakResult {
+  const effectiveGoal = goal > 0 ? goal : DAILY_GOAL
   // Agrupa tentativas por dia local
   const byDay = new Map<string, number>()
   for (const attempt of attempts) {
@@ -58,12 +63,12 @@ export function computeStreak(attempts: Attempt[], now: Date = new Date()): Stre
   const yesterdayKey = toLocalDayKey(yesterdayDate)
 
   const todayCount = byDay.get(todayKey) ?? 0
-  const completedToday = todayCount >= DAILY_GOAL
+  const completedToday = todayCount >= effectiveGoal
 
   // Conjunto de dias "qualificados" (atingiu a meta)
   const qualifiedDays = new Set<string>()
   for (const [day, count] of byDay) {
-    if (count >= DAILY_GOAL) qualifiedDays.add(day)
+    if (count >= effectiveGoal) qualifiedDays.add(day)
   }
 
   // Calcula melhor sequência (histórica)
@@ -112,7 +117,7 @@ export function computeStreak(attempts: Attempt[], now: Date = new Date()): Stre
     current,
     best: Math.max(best, current),
     todayCount,
-    goal: DAILY_GOAL,
+    goal: effectiveGoal,
     completedToday,
     activeYesterday,
   }

@@ -9,6 +9,10 @@ import { ReviewsPage } from '@/modules/reviews/ui/ReviewsPage'
 import { SchedulePage } from '@/modules/schedule/ui/SchedulePage'
 import { StatisticsPage } from '@/modules/statistics/ui/StatisticsPage'
 import { BackupPage } from '@/modules/backup/ui/BackupPage'
+import { DisciplinesPage } from '@/modules/taxonomy/ui/DisciplinesPage'
+import { ConfigPage } from '@/modules/config/ui/ConfigPage'
+import { MaterialsPage } from '@/modules/materials/ui/MaterialsPage'
+import { BadgesPage } from '@/modules/badges/ui/BadgesPage'
 import { Button } from '@/shared/ui/Button'
 
 function RouteError() {
@@ -42,6 +46,10 @@ export const router = createBrowserRouter([
       { path: 'revisoes', element: <ReviewsPage /> },
       { path: 'cronograma', element: <SchedulePage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
+      { path: 'disciplinas', element: <DisciplinesPage /> },
+      { path: 'configuracoes', element: <ConfigPage /> },
+      { path: 'materiais', element: <MaterialsPage /> },
+      { path: 'badges', element: <BadgesPage /> },
       { path: 'backup', element: <BackupPage /> },
     ],
   },

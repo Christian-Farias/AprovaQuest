@@ -5,6 +5,7 @@ import {
   type BoardInput,
   type ContestInput,
   type DisciplineInput,
+  type SubjectInput,
   type TopicInput,
 } from '@/modules/questions/data/taxonomy.repo'
 import { type Clock } from '@/shared/lib/dates'
@@ -20,6 +21,12 @@ export function createTaxonomyService(db: AprovaQuestDatabase = getDb()) {
     updateDiscipline: (id: string, input: DisciplineInput, clock?: Clock) =>
       toResult(() => repo.updateDiscipline(id, input, clock)),
     deleteDiscipline: (id: string) => toResult(() => repo.deleteDiscipline(id)),
+    listSubjects: (disciplineId?: string) => toResult(() => repo.listSubjects(disciplineId)),
+    createSubject: (input: SubjectInput, clock?: Clock) =>
+      toResult(() => repo.createSubject(input, clock)),
+    updateSubject: (id: string, input: Partial<SubjectInput>, clock?: Clock) =>
+      toResult(() => repo.updateSubject(id, input, clock)),
+    deleteSubject: (id: string) => toResult(() => repo.deleteSubject(id)),
     listTopics: (disciplineId?: string) => toResult(() => repo.listTopics(disciplineId)),
     createTopic: (input: TopicInput, clock?: Clock) => toResult(() => repo.createTopic(input, clock)),
     updateTopic: (id: string, input: Partial<TopicInput>, clock?: Clock) =>

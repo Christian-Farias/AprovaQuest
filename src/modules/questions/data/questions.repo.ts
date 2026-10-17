@@ -16,6 +16,7 @@ import { normalizeSkeleton, similarity } from '@/shared/lib/text'
 
 export interface QuestionFilter {
   disciplineId?: string
+  subjectId?: string
   topicId?: string
   type?: Question['type']
   status?: QuestionStatus
@@ -41,12 +42,14 @@ function toQuestionRecord(input: CreateQuestionInput, clock?: Clock, existing?: 
     type: input.type,
     statement: input.statement.trim(),
     disciplineId: input.disciplineId,
+    subjectId: input.subjectId ?? null,
     topicId: input.topicId ?? null,
     boardId: input.boardId ?? null,
     contestId: input.contestId ?? null,
     source: input.source ?? null,
     explanation: input.explanation ?? null,
     tags: input.tags ?? [],
+    difficulty: input.difficulty ?? existing?.difficulty ?? 1,
     status: existing?.status ?? 'active',
     annulled: existing?.annulled ?? false,
     answerConfirmed: input.answerConfirmed ?? true,
@@ -60,6 +63,7 @@ export function createQuestionsRepo(db: AprovaQuestDatabase = getDb()) {
     const all = await db.questions.orderBy('createdAt').reverse().toArray()
     return all.filter((q) => {
       if (filter.disciplineId && q.disciplineId !== filter.disciplineId) return false
+      if (filter.subjectId && q.subjectId !== filter.subjectId) return false
       if (filter.topicId && q.topicId !== filter.topicId) return false
       if (filter.type && q.type !== filter.type) return false
       if (filter.status && q.status !== filter.status) return false

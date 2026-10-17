@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Compiled artifacts accidentally emitted into source (use .ts/.tsx only)
+src/**/*.js
+src/**/*.js.map
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

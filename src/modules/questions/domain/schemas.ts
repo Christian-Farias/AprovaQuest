@@ -47,10 +47,19 @@ export const disciplineSchema = z.object({
   updatedAt: isoString,
 })
 
-export const topicSchema = z.object({
+export const subjectSchema = z.object({
   id: uuid,
   disciplineId: uuid,
   name: nonEmpty('Nome do assunto'),
+  createdAt: isoString,
+  updatedAt: isoString,
+})
+
+export const topicSchema = z.object({
+  id: uuid,
+  disciplineId: uuid,
+  subjectId: uuid.nullable().optional().default(null),
+  name: nonEmpty('Nome do tópico'),
   createdAt: isoString,
   updatedAt: isoString,
 })
@@ -79,17 +88,21 @@ export const optionSchema = z.object({
   createdAt: isoString,
 })
 
+export const difficultySchema = z.union([z.literal(1), z.literal(2), z.literal(3)])
+
 export const questionSchema = z.object({
   id: uuid,
   type: questionTypeSchema,
   statement: nonEmpty('Enunciado'),
   disciplineId: uuid,
+  subjectId: uuid.nullable().optional().default(null),
   topicId: uuid.nullable(),
   boardId: uuid.nullable(),
   contestId: uuid.nullable(),
   source: z.string().nullable(),
   explanation: z.string().nullable(),
   tags: z.array(z.string()),
+  difficulty: difficultySchema.optional().default(1),
   status: questionStatusSchema,
   annulled: z.boolean(),
   answerConfirmed: z.boolean(),
@@ -108,6 +121,7 @@ export const attemptSchema = z.object({
 })
 
 export type DisciplineEntity = z.infer<typeof disciplineSchema>
+export type SubjectEntity = z.infer<typeof subjectSchema>
 export type TopicEntity = z.infer<typeof topicSchema>
 export type BoardEntity = z.infer<typeof boardSchema>
 export type ContestEntity = z.infer<typeof contestSchema>
@@ -126,12 +140,14 @@ export interface CreateQuestionInput {
   type: QuestionType
   statement: string
   disciplineId: string
+  subjectId?: string | null
   topicId?: string | null
   boardId?: string | null
   contestId?: string | null
   source?: string | null
   explanation?: string | null
   tags?: string[]
+  difficulty?: 1 | 2 | 3
   options: OptionInput[]
   answerConfirmed?: boolean
 }
@@ -149,12 +165,14 @@ const createQuestionBase = z.object({
   type: questionTypeSchema,
   statement: nonEmpty('Enunciado'),
   disciplineId: uuid,
+  subjectId: uuid.nullable().optional().default(null),
   topicId: uuid.nullable().optional().default(null),
   boardId: uuid.nullable().optional().default(null),
   contestId: uuid.nullable().optional().default(null),
   source: z.string().nullable().optional().default(null),
   explanation: z.string().nullable().optional().default(null),
   tags: z.array(z.string().trim().min(1)).optional().default([]),
+  difficulty: difficultySchema.optional().default(1),
   options: z.array(optionInputSchema),
   answerConfirmed: z.boolean().optional().default(true),
 })

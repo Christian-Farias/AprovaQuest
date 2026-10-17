@@ -1,5 +1,6 @@
 import { useOverallStats } from '@/modules/statistics/application/statistics.hooks'
 import { useStreak } from '@/modules/statistics/application/useStreak'
+import { useBadges } from '@/modules/badges/application/useBadges'
 import { formatDurationMs, formatPercent } from '@/shared/lib/format'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { StatCard } from '@/shared/ui/StatCard'
@@ -10,6 +11,7 @@ import { StreakDashboardCard } from '@/shared/ui/StreakBadge'
 export function DashboardPage() {
   const stats = useOverallStats()
   const streak = useStreak()
+  const badges = useBadges()
 
   if (stats === undefined) {
     return (
@@ -72,6 +74,14 @@ export function DashboardPage() {
             hint="por questão"
             tone="accent"
           />
+          {badges && (
+            <StatCard
+              label="Nível"
+              value={badges.level.level}
+              hint={`${badges.xp} XP · ${badges.unlockedCount}/${badges.badges.length} badges`}
+              tone="brand"
+            />
+          )}
         </div>
       )}
     </div>

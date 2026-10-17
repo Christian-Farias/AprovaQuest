@@ -29,14 +29,32 @@ export interface Discipline {
   color?: string | null
   createdAt: string
   updatedAt: string
+  userId?: string
+  dirty?: number
+  deletedAt?: string | null
 }
 
 export interface Topic {
   id: string
   disciplineId: string
+  subjectId?: string | null
   name: string
   createdAt: string
   updatedAt: string
+  userId?: string
+  dirty?: number
+  deletedAt?: string | null
+}
+
+export interface Subject {
+  id: string
+  disciplineId: string
+  name: string
+  createdAt: string
+  updatedAt: string
+  userId?: string
+  dirty?: number
+  deletedAt?: string | null
 }
 
 export interface Board {
@@ -57,6 +75,7 @@ export interface Question {
   type: QuestionType
   statement: string
   disciplineId: string
+  subjectId?: string | null
   topicId: string | null
   boardId: string | null
   contestId: string | null
@@ -68,6 +87,10 @@ export interface Question {
   answerConfirmed: boolean
   createdAt: string
   updatedAt: string
+  difficulty?: 1 | 2 | 3
+  userId?: string
+  dirty?: number
+  deletedAt?: string | null
 }
 
 export interface QuestionOption {

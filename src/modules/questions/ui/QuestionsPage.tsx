@@ -9,7 +9,7 @@ import { PageHeader } from '@/shared/ui/PageHeader'
 import { SkeletonList } from '@/shared/ui/LoadingState'
 import { useToast } from '@/shared/toast/useToast'
 import { useConfirm } from '@/shared/ui/ConfirmDialog'
-import { useDisciplines, useQuestions } from '../application/questions.hooks'
+import { useDisciplines, useSubjects, useTopics, useQuestions } from '../application/questions.hooks'
 import { useQuestionsService } from '../application/useQuestionsService'
 import { QuestionFormModal } from './QuestionFormModal'
 import { PracticeModal } from './PracticeModal'
@@ -18,6 +18,8 @@ type StatusFilter = QuestionStatus | 'all'
 
 export function QuestionsPage() {
   const [disciplineId, setDisciplineId] = useState('')
+  const [subjectId, setSubjectId] = useState('')
+  const [topicId, setTopicId] = useState('')
   const [status, setStatus] = useState<StatusFilter>('active')
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
@@ -25,8 +27,12 @@ export function QuestionsPage() {
   const [practicing, setPracticing] = useState<Question | undefined>()
 
   const disciplines = useDisciplines()
+  const subjects = useSubjects(disciplineId || undefined)
+  const topics = useTopics({ disciplineId: disciplineId || undefined, subjectId: subjectId || undefined })
   const questions = useQuestions({
     disciplineId: disciplineId || undefined,
+    subjectId: subjectId || undefined,
+    topicId: topicId || undefined,
     status: status === 'all' ? undefined : status,
   })
   const service = useQuestionsService()
@@ -94,7 +100,7 @@ export function QuestionsPage() {
         }
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:max-w-3xl">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-5xl">
         <Field label="Busca textual">
           <Input
             value={search}
@@ -103,11 +109,31 @@ export function QuestionsPage() {
           />
         </Field>
         <Field label="Disciplina">
-          <Select value={disciplineId} onChange={(e) => setDisciplineId(e.target.value)}>
+          <Select value={disciplineId} onChange={(e) => { setDisciplineId(e.target.value); setSubjectId(''); setTopicId('') }}>
             <option value="">Todas</option>
             {(disciplines ?? []).map((d) => (
               <option key={d.id} value={d.id}>
                 {d.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Assunto">
+          <Select value={subjectId} onChange={(e) => { setSubjectId(e.target.value); setTopicId('') }} disabled={!disciplineId}>
+            <option value="">Todos</option>
+            {(subjects ?? []).map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Tópico">
+          <Select value={topicId} onChange={(e) => setTopicId(e.target.value)} disabled={!disciplineId && !subjectId}>
+            <option value="">Todos</option>
+            {(topics ?? []).map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
               </option>
             ))}
           </Select>

@@ -12,6 +12,10 @@ export const routes = {
   reviews: '/revisoes',
   schedule: '/cronograma',
   statistics: '/estatisticas',
+  disciplines: '/disciplinas',
+  configurations: '/configuracoes',
+  materials: '/materiais',
+  badges: '/badges',
   backup: '/backup',
 } as const
 
